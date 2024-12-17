@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{
+        margin: 0;padding: 0;border: 0;font-size: 100%;font: inherit;vertical-align: baseline;}
+        article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section{ display: block;}
+        body{ line-height: 1;}
+        ol,ul{ list-style: none;}
+        blockquote,q{ quotes: none;}
+        blockquote:after,blockquote:before,q:after,q:before{ content: "";content: none;}
+        table{ border-collapse: collapse;border-spacing: 0;}
+        *{ box-sizing: border-box;}
+        body,html{ background: linear-gradient(to right,#002,#0d0e2e,#161966);}
+        div#container{ display: flex;flex-direction: column;width: 100%;padding: 1rem;max-width: 430px;margin: auto;}
+        input{ padding: .75rem .5rem;}
+        input#result{ color: green;}
+        input#result:focus{ outline: 0;}
+        select{ padding: .75rem .5rem;}
+        select#type{ margin: 1rem 0;}
+        option{ background-color: #f0f8ff;color: #00f;}
+        .p-1{ padding: 1rem;background-color: #a9a9a9;text-align: center;padding: 1rem;margin: 1rem 0;font-family: cursive;}
+        .numbers{ display: grid;grid-template-columns: 1fr 1fr 1fr;grid-template-rows: 1fr 1fr 1fr 1fr 1fr;margin: 1rem 0;gap: .25rem;}
+        button{ padding: .75rem;}
+        #negative{ display: none;}
+        select, input, p, button, option { font-family: Verdana, Geneva, Tahoma, sans-serif; font-size:1rem; font-weight: 500;}
+        footer{ background-color: black; color: white; padding: 3rem; margin: auto; text-align: center;font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 1rem; opacity: 0.4; font-variant: all-small-caps;}
+        span.name { font-size: 1.5rem; font-weight: 500; font-variant: petite-caps;}
+                </style>
+</head>
+
+<body>
+    <div id="container">
+        <select id="type">
+            <option value="Area">Area</option>
+            <option value="Length">Length</option>
+            <option value="Temperature">Temperature</option>
+            <option value="Volume">Volume</option>
+            <option value="Mass">Mass</option>
+            <option value="Data">Data</option>
+            <option value="Speed">Speed</option>
+            <option value="Time">Time</option>
+        </select>
+    
+        <input type="text" required placeholder="Enter:" id="enter">
+        <select class='select-type'>
+            <option value='ac'>Acres (ac)</option>
+            <option value='a'>Ares (a)</option>
+            <option value='ha'>Hectares (ha)</option>
+            <option value='cm2'>Square Centimeters (cm2)</option>
+            <option value='ft2'>Square Feet (ft2)</option>
+            <option value='in2'>Square Inches (in2)</option>
+            <option value='m2'>Square Meters (m2)</option>
+        </select>
+        <p class="p-1">to : </p>
+        <select class='select-type'>
+            <option value='ac'>Acres (ac)</option>
+            <option value='a'>Ares (a)</option>
+            <option value='ha'>Hectares (ha)</option>
+            <option value='cm2'>Square Centimeters (cm2)</option>
+            <option value='ft2'>Square Feet (ft2)</option>
+            <option value='in2'>Square Inches (in2)</option>
+            <option value='m2'>Square Meters (m2)</option>
+        </select>
+        <input type="text" readonly placeholder="Result" id="result">
+    
+        <div class="numbers">
+            <button>1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>4</button>
+            <button>5</button>
+            <button>6</button>
+            <button>7</button>
+            <button>8</button>
+            <button>9</button>
+            <button id="negative">+/-</button>
+            <button style="grid-column: 2 / 3; grid-row: 5 / 6;">0</button>
+            <button style="grid-column: 1 / 2; grid-row: 1 / 2;">del</button>
+            <button style="grid-column: 2 / 4; grid-row: 1 / 2;">C</button>
+        </div>
+        <button id="calculateButton">calculate</button>
+    </div>
+
+    <script>
+        let enter = document.getElementById("enter");
+            let type = document.getElementById("type");
+            let result = document.getElementById("result");
+            let selectType = document.querySelectorAll(".select-type");
+            let button = document.querySelectorAll("button");
+            writeFooter();
+            let n = "",
+                i = 0;
+            let unit1, unit2;
+
+            type.addEventListener("change", () => {
+                removeInitialize ();
+                switch (type.value) {
+                    case "Area": {
+                        let selectText = `<select class='select-type'>
+                        <option value='ac'>Acres (ac)</option>
+                        <option value='a'>Ares (a)</option>
+                        <option value='ha'>Hectares (ha)</option>
+                        <option value='cm2'>Square Centimeters (cm2)</option>
+                        <option value='ft2'>Square Feet (ft2)</option>
+                        <option value='in2'>Square Inches (in2)</option>
+                        <option value='m2'>Square Meters (m2)</option>
+                        </select>`;
+                        writeSelect(selectType, selectText);
+                        unit1 = "ac", unit2 = "ac";
+                        listener(unit1, unit2);
+                        document.getElementById("negative").style.display = "none";
+                    }
+                        break;
+
+                    case "Length": {
+                        let selectText = `<select class='select-type'>
+                            <option value='mm'>Milimeters</option>
+                            <option value='cm'>Centimeters</option>
+                            <option value='m'>Meters</option>
+                            <option value='km'>Kilometers</option>
+                            <option value='in'>inches</option>
+                            <option value='ft'>Feet</option>
+                            <option value='yd'>Yards</option>
+                            <option value='mi'>Miles</option>
+                            </select>`;
+                        writeSelect(selectType, selectText);
+                        unit1 = "mm", unit2 = "mm";
+                        listener(unit1, unit2);
+                        document.getElementById("negative").style.display = "none";
+                    }
+                        break;
+
+                    case "Temperature": {
+                        let selectText = `<select class='select-type'>
+                            <option value='C'>Celsius</option>
+                            <option value='F'>Fahrenheit</option>
+                            <option value='K'>Kelvin</option>
+                            </select>`;
+                        writeSelect(selectType, selectText);
+                        unit1 = "C", unit2 = "C";
+                        listener(unit1, unit2);
+                        document.getElementById("negative").style.display = "block";
+                    }
+                        break;
+
+                    case "Volume": {
+                        let selectText = `<select class='select-type'>
+                        <option value='uk-gal'>UK gallons (gal)</option>
+                        <option value='us-gal'>US gallons (gal)</option>
+                        <option value='l'>Liters</option>
+                        <option value='ml'>Milliliters (ml)</option>
+                        <option value='cm3'>Cubic centimeters (cc) (cm3)</option>
+                        <option value='m3'>Cubic Meters (m3)</option>
+                        <option value='in3'>Cubic Inches (in3)</option>
+                        <option value='ft3'>Cubic Feet (ft3)</option>
+                        </select>`;
+                        writeSelect(selectType, selectText);
+                        unit1 = "uk-gal", unit2 = "uk-gal";
+                        listener(unit1, unit2);
+                        document.getElementById("negative").style.display = "none";
+                    }
+                        break;
+
+                    case "Mass": {
+                        let selectText = `<select class='select-type'>
+                            <option value='t'>Tons (t)</option>
+                            <option value='uk-t'>UK tons(t)</option>
+                            <option value='us-t'>US tons (t)</option>
+                            <option value='lb'>Pounds (lb)</option>
+                            <option value='oz'>Ounces</option>
+                            <option value='kg'>Kilograms (kg)</option>
+                            <option value='g'>Grams (g)</option>
+                            </select>`;
+                        writeSelect(selectType, selectText);
+                        unit1 = "t", unit2 = "t";
+                        listener(unit1, unit2);
+                        document.getElementById("negative").style.display = "none";
+                    }
+                        break;
+
+                    case "Data": {
+                        let selectText = `<select class='select-type'>
+                                <option value='bit'>Bits (bit)</option>
+                                <option value='B'>Bytes (B)</option>
+                                <option value='KB'>KiloBites (KB)</option>
+                                <option value='KiB'>KibiBytes (KiB)</option>
+                                <option value='MB'>MegaBytes (MB)</option>
+                                <option value='MiB'>MebiBytes (MiB)</option>
+                                <option value='GB'>GigaBytes (GB)</option>
+                                <option value='GiB'>GibiBytes (GiB)</option>
+                                <option value='TB'>TeraBytes (TB)</option>
+                        <option value='TiB'>TebiBytes (TiB)</option>
+                        </select>`;
+                        writeSelect(selectType, selectText);
+                        unit1 = "bit", unit2 = "bit";
+                        listener(unit1, unit2);
+                        document.getElementById("negative").style.display = "none";
+                    }
+                        break;
+
+                    case "Speed": {
+                        let selectText = `<select class='select-type'>
+                            <option value='m/s'>Meters per Second (m/s)</option>
+                            <option value='m/h'>Meters per Hour (m/h)</option>
+                            <option value='km/s'>Kilometers per Second (km/s)</option>
+                            <option value='km/h'>Kilometers per Hour (km/h)</option>
+                            <option value='in/s'>Inches per Second (in/s)</option>
+                            <option value='in/h'>Inches per Hour (in/h)</option>
+                            <option value='ft/s'>Feet per Second (ft/s)</option>
+                            <option value='ft/h'>Feet per Hour (ft/h)</option>
+                            <option value='mi/s'>Miles per Second (mi/s)</option>
+                            <option value='mi/h'>Miles per Hour (mi/h)</option>
+                            <option value='kn'>Knots</option>
+                            </select>`;
+                        writeSelect(selectType, selectText);
+                        unit1 = "m/s", unit2 = "m/s";
+                        listener(unit1, unit2);
+                        document.getElementById("negative").style.display = "none";
+                    }
+                        break;
+
+                    case "Time": {
+                        let selectText = `<select class='select-type'>
+                                <option value='ms'>Milliseconds (ms)</option>
+                                <option value='s'>Seconds (s)</option>
+                                <option value='min'>Minutes (min)</option>
+                                <option value='h'>Hours (h)</option>
+                                <option value='d'>Days (d)</option>
+                                <option value='wk'>Weeks (wk)</option>
+                                <option value='mo'>Mounths (mo)</option>
+                                <option value='yr'>Years (yr)</option>
+                                </select>`;
+                        writeSelect(selectType, selectText);
+                        unit1 = "ms", unit2 = "ms";
+                        listener(unit1, unit2);
+                        document.getElementById("negative").style.display = "none";
+                    }
+                        break;
+                    default:
+                        break;
+                }
+            })
+
+            window.onload = function () {
+                document.getElementById("enter").focus();
+            };
+
+            button.forEach(btn => {
+                btn.addEventListener("click", (event) => keyboard(event)); // ارسال event به تابع  
+            });
+            document.addEventListener("keydown", (event) => {
+                if (event.key == 1 || event.key == 2 || event.key == 3 || event.key == 4 || event.key == 5 || event.key == 6 || event.key == 7 || event.key == 8 || event.key == 9 || event.key == 0 || event.key == "Backspace") {
+                    n += event.key; // اضافه کردن مقدار دکمه به n  
+                    // enter.value = n; // نمایش مقدار n در ورودی  
+                    if (event.key === "Backspace") {
+                        n = n.slice(0, -10);
+                    }
+                }
+            });
+            function keyboard(event) {
+                n += event.target.innerHTML; // اضافه کردن مقدار دکمه به n  
+                enter.value = n; // نمایش مقدار n در ورودی  
+
+                switch (event.target.innerHTML) {
+                    case "C": {
+                        removeInitialize ();
+                    }
+                        break;
+
+                    case "del": {
+                        n = n.slice(0, -4); // حذف آخرین 4 کاراکتر از n  
+                        enter.value = n; // نمایش مقدار جدید در ورودی  
+                    }
+                        break;
+
+                    // این شرط به نظر می‌رسد که نیاز به اصلاح دارد  
+                    // اگر هدف شما بررسی خالی بودن n است، از if استفاده کنید  
+                    case "": {
+                        enter.value = n; // نمایش مقدار n در ورودی  
+                    }
+                        break;
+
+                    case "calculate": {
+                        n = n.slice(0, -9); // حذف آخرین 9 کاراکتر از n  
+                        enter.value = n; // نمایش مقدار جدید در ورودی  
+                    }
+                        break;
+
+                    case "+/-": {
+                        // حذف "+/-" از n  
+                        n = n.replace("+/-", "-")
+                        enter.value = n;
+                        // بررسی اینکه آیا n عدد است یا نه  
+                        if (isNaN(parseFloat(n))) {
+                            n = "-"; // اگر عدد نیست، n را به -1 تغییر دهید  
+                        } else {
+                            // معکوس کردن علامت عدد  
+                            n = parseFloat(n) * -1; // تبدیل به عدد و معکوس کردن علامت  
+                        }
+
+                        enter.value = n; // نمایش مقدار جدید در ورودی  
+                    }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            function removeInitialize () {
+                n = ''; // پاک کردن n 
+                result.value = '';
+                enter.value = n; // نمایش مقدار خالی در ورودی  
+            }
+
+            function writeSelect(elements, text) {
+                elements.forEach(element => {
+                    element.innerHTML = text;
+                })
+            }
+
+            if (type.value == "Area") {
+                unit1 = "ac", unit2 = "ac";
+                listener(unit1, unit2);
+            }
+
+
+            function listener(unit1, unit2) {
+                selectType[0].addEventListener("change", (event) => {
+                    unit1 = event.target.value;
+                    console.log(unit1);
+                })
+                selectType[1].addEventListener("change", (event) => {
+                    unit2 = event.target.value;
+                    console.log(unit2);
+                })
+                document.getElementById("calculateButton").addEventListener("click", () => {
+                    const valueToConvert = parseFloat(n);
+                    if (!isNaN(valueToConvert) && unit1 && unit2) {
+                        switch (type.value) {
+                            case "Area": result.value = areaCalculator(valueToConvert, unit1, unit2); break;
+                            case "Length": result.value = lengthCalculator(valueToConvert, unit1, unit2); break;
+                            case "Temperature": result.value = TemperatureCalculator(valueToConvert, unit1, unit2); break;
+                            case "Volume": result.value = volumeCalculator(valueToConvert, unit1, unit2); break;
+                            case "Mass": result.value = massCalculator(valueToConvert, unit1, unit2); break;
+                            case "Data": result.value = DataCalculator(valueToConvert, unit1, unit2); break;
+                            case "Speed": result.value = SpeedCalculator(valueToConvert, unit1, unit2); break;
+                            case "Time": result.value = TimeCalculator(valueToConvert, unit1, unit2); break;
+                            default: result.value = "Error: type is not defined!";
+                        }
+                    }
+                })
+            }
+
+            function writeFooter () {
+                document.getElementById("container").insertAdjacentHTML("afterend","<footer>Powered By <span class='name'>Ariyan Surena</span></footer>")
+            }
+
+            function areaCalculator(value, u1, u2) {
+                let squareMeter;
+                switch (u1) {
+                    case "ac": squareMeter = value * 4046.86; break; // تبدیل از اکر به متر مربع  
+                    case "a": squareMeter = value * 100; break; // تبدیل از آرس به متر مربع  
+                    case "ha": squareMeter = value * 10000; break; // تبدیل از هکتار به متر مربع  
+                    case "cm2": squareMeter = value * 0.0001; break; // تبدیل از سانتی‌متر مربع به متر مربع  
+                    case "ft2": squareMeter = value * 0.092903; break; // تبدیل از فوت مربع به متر مربع  
+                    case "in2": squareMeter = value * 0.00064516; break; // تبدیل از اینچ مربع به متر مربع  
+                    case "m2": squareMeter = value; break; // متر مربع  
+                    default: return "Error: واحد ورودی نامعتبر است!";
+                }
+
+                // تبدیل به واحد دوم  
+                switch (u2) {
+                    case "ac": return squareMeter / 4046.86; // تبدیل به اکر  
+                    case "a": return squareMeter / 100; // تبدیل به آرس  
+                    case "ha": return squareMeter / 10000; // تبدیل به هکتار  
+                    case "cm2": return squareMeter / 0.0001; // تبدیل به سانتی‌متر مربع  
+                    case "ft2": return squareMeter / 0.092903; // تبدیل به فوت مربع  
+                    case "in2": return squareMeter / 0.00064516; // تبدیل به اینچ مربع  
+                    case "m2": return squareMeter; // متر مربع  
+                    default: return "Error: واحد خروجی نامعتبر است!";
+                }
+            }
+
+            function lengthCalculator(value, u1, u2) {
+                let meter;
+                // تبدیل به متر  
+                switch (u1) {
+                    case "mm": meter = value / 1000; break;
+                    case "cm": meter = value / 100; break;
+                    case "m": meter = value; break;
+                    case "km": meter = value * 1000; break;
+                    case "in": meter = value * 0.0254; break; // 1 inch = 0.0254 meter  
+                    case "ft": meter = value * 0.3048; break; // 1 foot = 0.3048 meter  
+                    case "yd": meter = value * 0.9144; break; // 1 yard = 0.9144 meter  
+                    case "mi": meter = value * 1609.34; break; // 1 mile = 1609.34 meter  
+                    default: return "Error: واحد ورودی نامعتبر است!";
+                }
+
+                // تبدیل به واحد مقصد  
+                switch (u2) {
+                    case "mm": return meter * 1000;
+                    case "cm": return meter * 100;
+                    case "m": return meter;
+                    case "km": return meter / 1000;
+                    case "in": return meter / 0.0254; // تبدیل متر به اینچ  
+                    case "ft": return meter / 0.3048; // تبدیل متر به فوت  
+                    case "yd": return meter / 0.9144; // تبدیل متر به یارد  
+                    case "mi": return meter / 1609.34; // تبدیل متر به مایل  
+                    default: return "Error: واحد مقصد نامعتبر است!";
+                }
+            }
+
+            function TemperatureCalculator(value, u1, u2) {
+                let celsius;
+
+                // تبدیل مقدار ورودی به سلسیوس  
+                switch (u1) {
+                    case "C": celsius = value; break;
+                    case "F": celsius = (value - 32) * (5 / 9); break; // تبدیل از فارنهایت به سلسیوس
+                    case "K": celsius = value - 273.15; break; // تبدیل از کلوین به سلسیوس 
+                    default: return "Error: واحد ورودی نامعتبر است!";
+                }
+
+                // تبدیل دما از سلسیوس به واحد مقصد  
+                switch (u2) {
+                    case "C": return celsius; // بازگشت به سلسیوس  
+                    case "F": return (celsius * 9 / 5) + 32; // تبدیل به فارنهایت  
+                    case "K": return celsius + 273.15; // تبدیل به کلوین  
+                    default: return "Error: واحد مقصد نامعتبر است!";
+                }
+
+            }
+
+            function volumeCalculator(value, u1, u2) {
+                let volume;
+
+                // تبدیل به لیتر  
+                switch (u1) {
+                    case "uk-gal": volume = value * 4.54609; break; // UK gallon to liters  
+                    case "us-gal": volume = value * 3.78541; break; // US gallon to liters  
+                    case "l": volume = value; break;                // liters to liters  
+                    case "ml": volume = value / 1000; break;       // milliliters to liters  
+                    case "cm3": volume = value / 1000; break;      // cubic centimeters to liters  
+                    case "m3": volume = value * 1000; break;       // cubic meters to liters  
+                    case "in3": volume = value * 0.0163871; break;  // cubic inches to liters  
+                    case "ft3": volume = value * 28.3168; break;    // cubic feet to liters  
+
+                    default: return "Error: واحد ورودی نامعتبر است!";
+                }
+
+                // تبدیل از لیتر به واحد u2  
+                switch (u2) {
+                    case "uk-gal": return volume / 4.54609; // Liters to UK gallons  
+                    case "us-gal": return volume / 3.78541; // Liters to US gallons  
+                    case "l": return volume;                  // Liters to liters  
+                    case "ml": return volume * 1000;         // Liters to milliliters  
+                    case "cm3": return volume * 1000;        // Liters to cubic centimeters  
+                    case "m3": return volume / 1000;         // Liters to cubic meters  
+                    case "in3": return volume / 0.0163871;   // Liters to cubic inches  
+                    case "ft3": return volume / 28.3168;     // Liters to cubic feet  
+
+                    default: return "Error: واحد هدف نامعتبر است!";
+                }
+            }
+
+            function massCalculator(value, u1, u2) {
+                let mass;
+
+                // تبدیل به کیلوگرم  
+                switch (u1) {
+                    case "t": mass = value * 1000; break;        // Tons to kilograms  
+                    case "uk-t": mass = value * 1016.05; break; // UK Tons to kilograms  
+                    case "us-t": mass = value * 907.185; break; // US Tons to kilograms  
+                    case "lb": mass = value * 0.453592; break;   // Pounds to kilograms  
+                    case "oz": mass = value * 0.0283495; break;  // Ounces to kilograms  
+                    case "kg": mass = value;                      // Kilograms to kilograms  
+                    case "g": mass = value / 1000;                // Grams to kilograms  
+
+                    default: return "Error: واحد ورودی نامعتبر است!";
+                }
+
+                // تبدیل از کیلوگرم به واحد u2  
+                switch (u2) {
+                    case "t": return mass / 1000;                // Kilograms to Tons  
+                    case "uk-t": return mass / 1016.05;          // Kilograms to UK Tons  
+                    case "us-t": return mass / 907.185;          // Kilograms to US Tons  
+                    case "lb": return mass / 0.453592;           // Kilograms to Pounds  
+                    case "oz": return mass / 0.0283495;          // Kilograms to Ounces  
+                    case "kg": return mass;                       // Kilograms to kilograms  
+                    case "g": return mass * 1000;                // Kilograms to Grams  
+
+                    default: return "Error: واحد هدف نامعتبر است!";
+                }
+            }
+
+            function DataCalculator(value, u1, u2) {
+                let data;
+
+                // تبدیل به بایت  
+                switch (u1) {
+                    case "bit": data = value / 8; break;               // bits to bytes  
+                    case "B": data = value; break;                            // bytes to bytes  
+                    case "KB": data = value * 1024; break;                    // KB to bytes  
+                    case "KiB": data = value * 1024; break;                   // KiB to bytes  
+                    case "MB": data = value * 1024 * 1024; break;             // MB to bytes  
+                    case "MiB": data = value * 1024 * 1024; break;            // MiB to bytes  
+                    case "GB": data = value * 1024 * 1024 * 1024; break;      // GB to bytes  
+                    case "GiB": data = value * 1024 * 1024 * 1024; break;     // GiB to bytes  
+                    case "TB": data = value * 1024 * 1024 * 1024 * 1024; break;  // TB to bytes  
+                    case "TiB": data = value * 1024 * 1024 * 1024 * 1024; break; // TiB to bytes  
+
+                    default: return "Error: واحد ورودی نامعتبر است!";
+                }
+
+                // تبدیل از بایت به واحد u2  
+                switch (u2) {
+                    case "bit": return data * 8;                       // bytes to bits  
+                    case "B": return data;                              // bytes to bytes  
+                    case "KB": return data / 1024;                     // bytes to KB  
+                    case "KiB": return data / 1024;                    // bytes to KiB  
+                    case "MB": return data / (1024 * 1024);            // bytes to MB  
+                    case "MiB": return data / (1024 * 1024);           // bytes to MiB  
+                    case "GB": return data / (1024 * 1024 * 1024);     // bytes to GB  
+                    case "GiB": return data / (1024 * 1024 * 1024);    // bytes to GiB  
+                    case "TB": return data / (1024 * 1024 * 1024 * 1024); // bytes to TB  
+                    case "TiB": return data / (1024 * 1024 * 1024 * 1024); // bytes to TiB  
+
+                    default: return "Error: واحد هدف نامعتبر است!";
+                }
+            }
+
+            function SpeedCalculator(value, u1, u2) {
+                let speed;
+
+                // تبدیل به متر بر ثانیه (m/s)  
+                switch (u1) {
+                    case "m/s": speed = value; break;                     // متر بر ثانیه به متر بر ثانیه  
+                    case "m/h": speed = value / 3600; break;              // متر بر ساعت به متر بر ثانیه  
+                    case "km/s": speed = value * 1000; break;             // کیلومتر بر ثانیه به متر بر ثانیه  
+                    case "km/h": speed = value * (1000 / 3600); break;   // کیلومتر بر ساعت به متر بر ثانیه  
+                    case "in/s": speed = value * 0.0254; break;           // اینچ بر ثانیه به متر بر ثانیه  
+                    case "in/h": speed = value * 0.0254 / 3600; break;    // اینچ بر ساعت به متر بر ثانیه  
+                    case "ft/s": speed = value * 0.3048; break;           // فوت بر ثانیه به متر بر ثانیه  
+                    case "ft/h": speed = value * 0.3048 / 3600; break;    // فوت بر ساعت به متر بر ثانیه  
+                    case "mi/s": speed = value * 1609.34; break;          // مایل بر ثانیه به متر بر ثانیه  
+                    case "mi/h": speed = value * 1609.34 / 3600; break;   // مایل بر ساعت به متر بر ثانیه  
+                    case "kn": speed = value * 1852 / 3600; break;        // نات به متر بر ثانیه  
+
+                    default: return "Error: واحد ورودی نامعتبر است!";
+                }
+
+                // تبدیل از متر بر ثانیه به واحد u2  
+                switch (u2) {
+                    case "m/s": return speed;                              // متر بر ثانیه به متر بر ثانیه  
+                    case "m/h": return speed * 3600;                      // متر بر ثانیه به متر بر ساعت  
+                    case "km/s": return speed / 1000;                     // متر بر ثانیه به کیلومتر بر ثانیه  
+                    case "km/h": return speed * 3600 / 1000;              // متر بر ثانیه به کیلومتر بر ساعت  
+                    case "in/s": return speed / 0.0254;                   // متر بر ثانیه به اینچ بر ثانیه  
+                    case "in/h": return speed * 3600 / 0.0254;            // متر بر ثانیه به اینچ بر ساعت  
+                    case "ft/s": return speed / 0.3048;                   // متر بر ثانیه به فوت بر ثانیه  
+                    case "ft/h": return speed * 3600 / 0.3048;            // متر بر ثانیه به فوت بر ساعت  
+                    case "mi/s": return speed / 1609.34;                   // متر بر ثانیه به مایل بر ثانیه  
+                    case "mi/h": return speed * 3600 / 1609.34;           // متر بر ثانیه به مایل بر ساعت  
+                    case "kn": return speed * 3600 / 1852;                 // متر بر ثانیه به نات  
+
+                    default: return "Error: واحد هدف نامعتبر است!";
+                }
+            }
+
+            function TimeCalculator(value, u1, u2) {  
+                let time;  
+
+                // تبدیل به ثانیه  
+                switch (u1) {  
+                    case "s": time = value; break;          // ثانیه به ثانیه  
+                    case "ms": time = value / 1000; break;  // میلی ثانیه به ثانیه  
+                    case "min": time = value * 60; break;   // دقیقه به ثانیه  
+                    case "h": time = value * 3600; break;   // ساعت به ثانیه  
+                    case "d": time = value * 86400; break;  // روز به ثانیه  
+                    case "wk": time = value * 604800; break;// هفته به ثانیه  
+                    case "mo": time = value * 2628000; break;// ماه به ثانیه (تقریباً)  
+                    case "yr": time = value * 31536000; break;// سال به ثانیه (تقریباً)  
+
+                    default: return "Error: واحد ورودی نامعتبر است!";  
+                }  
+
+                // تبدیل از ثانیه به واحد u2  
+                switch (u2) {  
+                    case "s": return time;                 // ثانیه به ثانیه  
+                    case "ms": return time * 1000;         // ثانیه به میلی ثانیه  
+                    case "min": return time / 60;         // ثانیه به دقیقه  
+                    case "h": return time / 3600;         // ثانیه به ساعت  
+                    case "d": return time / 86400;        // ثانیه به روز  
+                    case "wk": return time / 604800;      // ثانیه به هفته  
+                    case "mo": return time / 2628000;     // ثانیه به ماه (تقریباً)  
+                    case "yr": return time / 31536000;     // ثانیه به سال (تقریباً)  
+
+                    default: return "Error: واحد هدف نامعتبر است!";  
+                }  
+        }
+    </script>
+</body>
+
+</html>
